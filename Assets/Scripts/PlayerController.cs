@@ -38,7 +38,7 @@ namespace TPSGame
             if (moveDirection.magnitude > 0)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
             }
             // Move the player
             MovePlayer(moveDirection);
@@ -54,12 +54,10 @@ namespace TPSGame
         private Vector3 CalculateMoveDirection(float horizontalValue, float verticalValue)
         {
             // Calculate move direction relative to the camera's forward direction
-            Vector3 forward = transform.forward;
-            forward.y = 0f;
-            Vector3 right = transform.right;
-            right.y = 0f;
+            Vector3 forward = Vector3.Scale(_rigidbody.transform.forward, new Vector3(1, 0, 1)).normalized;
+            Vector3 right = Vector3.Scale(_rigidbody.transform.right, new Vector3(1, 0, 1)).normalized;
 
-            return (forward.normalized * verticalValue + right.normalized * horizontalValue).normalized;
+            return (forward * verticalValue + right * horizontalValue).normalized;
         }
 
         void MovePlayer(Vector3 direction)
@@ -73,12 +71,17 @@ namespace TPSGame
             // Set animation based on movement direction
             if (moveDirection.magnitude > 0)
             {
-                _playerAnimator.SetFloat("moveAmount", 1); // Playing Walking Animation
+                _playerAnimator.SetFloat("moveAmount", .5f); // Playing Walking Animation
             }
             else
             {
                 _playerAnimator.SetFloat("moveAmount", 0); // Playing Idle Animation
             }
+        }
+
+        public void PlayAttack()
+        {
+            _playerAnimator.SetBool("isAttacking", true);
         }
         #endregion
     }
