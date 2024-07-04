@@ -1562,6 +1562,7 @@ MonoBehaviour:
   _popUpMessage: {fileID: 1854316669}
   _popUpTextTMP: {fileID: 119567911}
   _keyTMP: {fileID: 1422024001}
+  key: 
 --- !u!1 &878720410
 GameObject:
   m_ObjectHideFlags: 0
@@ -3145,7 +3146,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1477597190
 Transform:
   m_ObjectHideFlags: 0
@@ -3589,7 +3590,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeDuration: 5
-  _navigationContent: Collect the Password in First left house
+  _navigationContent: Collect the Key Password  in first house
+  _tpsCamera: {fileID: 224346150}
+  _fpsCamera: {fileID: 1179706791}
+  _tpsVirtualCamera: {fileID: 127796966}
 --- !u!1 &1726792346
 GameObject:
   m_ObjectHideFlags: 0
@@ -3859,7 +3863,7 @@ Transform:
   m_GameObject: {fileID: 1793101681}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 543.3, y: 0, z: 561.1}
+  m_LocalPosition: {x: 558.54, y: 0, z: 555.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -34,6 +34,12 @@ namespace TPSGame
         [SerializeField] private float timeDuration = 5f;
         [Header("PopUp Messages")]
         [SerializeField] private string _navigationContent;
+        [Header("Camera Components")]
+        [SerializeField] private GameObject _tpsCamera;
+        [SerializeField] private GameObject _fpsCamera;
+        [SerializeField] private GameObject _tpsVirtualCamera;
+
+        private bool isTPS = false;
         public GameState CurrentGameState { get; private set; } = GameState.Playing;
         #endregion
 
@@ -70,6 +76,15 @@ namespace TPSGame
 
             // After the loop, elapsedTime will be approximately equal to timeDuration
             UIController.Instance.DisplayPopUpMessage(_navigationContent);
+        }
+
+        public void SwitchView()
+        {
+            isTPS = !isTPS;
+
+            _tpsCamera.SetActive(isTPS);
+            _tpsVirtualCamera.SetActive(isTPS);
+            _fpsCamera.SetActive(!isTPS);
         }
         #endregion
 

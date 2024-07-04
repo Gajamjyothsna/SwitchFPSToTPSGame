@@ -136,6 +136,11 @@ namespace TPSGame
                 string text = GetRandomAlphabet().ToString();
                 UIController.Instance.DisplayKey(text);
                 Destroy(other.gameObject);
+
+                if (UIController.Instance.key.Length == 5)
+                {
+                    UIController.Instance.DisplayPopUpMessage("Go out of the room, the real game starts");
+                }
             }
         }
 

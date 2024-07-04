@@ -28,6 +28,8 @@ namespace TPSGame
         [SerializeField] private GameObject _popUpMessage;
         [SerializeField] private TextMeshProUGUI _popUpTextTMP;
         [SerializeField] private TextMeshProUGUI _keyTMP;
+
+        public string key;
         #endregion
 
         #region MonoBehaviour Methods
@@ -57,6 +59,7 @@ namespace TPSGame
         public void DisplayKey(string _key)
         {
             _keyTMP.text += _key;
+            key += _key;
         }
         #endregion
 
