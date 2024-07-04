@@ -22,17 +22,13 @@ namespace TPSGame
         #endregion
 
         #region Public Method
-        public void ToggleDoor()
+        public void OpenDoor()
         {
-            if (isOpen)
-            {
-                doorAnimator.SetTrigger("Close");
-            }
-            else
-            {
-                doorAnimator.SetTrigger("Open");
-            }
-            isOpen = !isOpen;
+            doorAnimator.SetTrigger("Open");
+        }
+        public void CloseDoor()
+        {
+            doorAnimator.SetTrigger("Close");
         }
         #endregion
     }

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 namespace TPSGame
@@ -11,8 +12,12 @@ namespace TPSGame
         [SerializeField] private float _jumpHeight = 3f;
         [SerializeField] private CharacterController _characterController;
         [SerializeField] private Transform _cameraTransform; // Reference to the camera's transform
+        [SerializeField] private DoorController _doorController;
 
         private Vector3 _moveDirection = Vector3.zero;
+        private Vector3 _climbOffset = Vector3.zero;
+        private bool _isClimbing = false;
+        
 
         private void Start()
         {
@@ -20,7 +25,9 @@ namespace TPSGame
             {
                 _characterController = GetComponent<CharacterController>();
             }
-           
+
+            // Print initial position for debugging
+            Debug.Log($"Initial player position: {transform.position}");
         }
 
         private void Update()
@@ -75,12 +82,31 @@ namespace TPSGame
             {
                 _moveDirection.y -= _gravity * Time.deltaTime;
             }
+            else
+            {
+                // Reset y position when grounded
+                _moveDirection.y = -_characterController.stepOffset; // Apply step offset to keep the player slightly above ground
+            }
+
+            // Apply move direction to character controller
+            _characterController.Move(_moveDirection * Time.deltaTime);
         }
 
         private void HandleAnimation()
         {
-            // Update animations based on movement
-            _playerAnimator.SetFloat("moveAmount", _characterController.velocity.magnitude / _playerSpeed); // Adjust based on your animation setup
+            // Get horizontal and vertical input values
+            float horizontalValue = Input.GetAxis("Horizontal");
+            float verticalValue = Input.GetAxis("Vertical");
+
+            // Set moveAmount to 1 if there is input action, otherwise set to 0
+            if (Mathf.Abs(horizontalValue) > 0.01f || Mathf.Abs(verticalValue) > 0.01f)
+            {
+                _playerAnimator.SetFloat("moveAmount", 1f);
+            }
+            else
+            {
+                _playerAnimator.SetFloat("moveAmount", 0f);
+            }
         }
 
         public void PlayAttack()
@@ -88,5 +114,63 @@ namespace TPSGame
             // Trigger attack animation
             _playerAnimator.SetBool("isAttacking", true);
         }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("ClimbTrigger"))
+            {
+                _isClimbing = true;
+                // Example: Adjust the player's position when entering climb trigger
+                _climbOffset = new Vector3(0f, 1f, 0f); // Adjust this offset based on your step height
+                Debug.Log("Enter ClimbTrigger");
+            }
+
+            if (other.CompareTag("DoorPoint"))
+            {
+                _doorController.OpenDoor();
+                UIController.Instance.DisplayPopUpMessage("Collect Blue Color Objects to Get the Keys");
+            }
+
+            if(other.CompareTag("Key"))
+            {
+                string text = GetRandomAlphabet().ToString();
+                UIController.Instance.DisplayKey(text);
+                Destroy(other.gameObject);
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("ClimbTrigger"))
+            {
+                _isClimbing = false;
+                // Reset climb offset when exiting climb trigger
+                _climbOffset = Vector3.zero;
+                Debug.Log("Exit ClimbTrigger");
+                // Reset player's y position to ground level when exiting climb trigger
+                transform.position = new Vector3(transform.position.x, _characterController.stepOffset, transform.position.z);
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            // Move the character controller with climb offset if climbing
+            if (_isClimbing)
+            {
+                _characterController.Move(_climbOffset * Time.deltaTime);
+            }
+        }
+
+        public static char GetRandomAlphabet()
+        {
+            // Generate a random number between 0 and 25
+            int randomNumber = Random.Range(0, 26);
+
+            // Convert the random number to a character (A-Z)
+            char randomAlphabet = (char)('A' + randomNumber);
+
+            return randomAlphabet;
+        }
+
     }
 }

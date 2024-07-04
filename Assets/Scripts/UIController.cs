@@ -27,6 +27,7 @@ namespace TPSGame
         [Header("UI Components")]
         [SerializeField] private GameObject _popUpMessage;
         [SerializeField] private TextMeshProUGUI _popUpTextTMP;
+        [SerializeField] private TextMeshProUGUI _keyTMP;
         #endregion
 
         #region MonoBehaviour Methods
@@ -51,6 +52,11 @@ namespace TPSGame
            _popUpTextTMP.text = message;
 
             Invoke("HidePopUpMessage", 5f);
+        }
+
+        public void DisplayKey(string _key)
+        {
+            _keyTMP.text += _key;
         }
         #endregion
 

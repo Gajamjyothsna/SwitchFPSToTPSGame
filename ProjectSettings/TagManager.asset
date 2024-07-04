@@ -6,6 +6,9 @@ TagManager:
   tags:
   - DoorPoint
   - Ground
+  - ClimbTrigger
+  - ExitClimbTrigger
+  - Key
   layers:
   - Default
   - TransparentFX
