@@ -1,88 +1,92 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 namespace TPSGame
 {
     public class PlayerController : MonoBehaviour
     {
-        #region Private Variables
         [SerializeField] private Animator _playerAnimator;
-        [SerializeField] private float _playerSpeed;
-        [SerializeField] private float _rotationSpeed = 1f;
+        [SerializeField] private float _playerSpeed = 5f;
+        [SerializeField] private float _rotationSpeed = 10f;
+        [SerializeField] private float _gravity = 9.81f; // Adjusted to standard gravity
+        [SerializeField] private float _jumpHeight = 3f;
+        [SerializeField] private CharacterController _characterController;
+        [SerializeField] private Transform _cameraTransform; // Reference to the camera's transform
 
-        private Transform playerTransform;
-        private Quaternion targetRotation;
-        private Vector3 moveDirection = Vector3.zero;
-        private Vector3 smoothMovementVelocity;
-        private Rigidbody _rigidbody;
-        #endregion
+        private Vector3 _moveDirection = Vector3.zero;
 
-        #region Monobehaviour Methods
         private void Start()
         {
-            playerTransform = transform;
-            _rigidbody = GetComponent<Rigidbody>();
+            if (_characterController == null)
+            {
+                _characterController = GetComponent<CharacterController>();
+            }
+           
         }
 
         private void Update()
         {
+            HandleRotation();
+            HandleMovement();
+            HandleAnimation();
+        }
+
+        private void HandleRotation()
+        {
+            // Get horizontal and vertical input values
             float horizontalValue = Input.GetAxis("Horizontal");
             float verticalValue = Input.GetAxis("Vertical");
 
-            // Calculate movement direction relative to player's forward direction
-            Vector3 moveDirection = CalculateMoveDirection(horizontalValue, verticalValue);
-            // Rotate player towards movement direction
-            if (moveDirection.magnitude > 0)
+            // Only rotate if there is movement input
+            if (Mathf.Abs(horizontalValue) > 0.01f || Mathf.Abs(verticalValue) > 0.01f)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+                // Calculate target direction based on input values
+                Vector3 targetDirection = new Vector3(horizontalValue, 0f, verticalValue);
+
+                // Convert input direction from local to world space
+                targetDirection = transform.TransformDirection(targetDirection);
+
+                // Ensure target direction is normalized
+                if (targetDirection.magnitude > 0)
+                {
+                    // Calculate target rotation
+                    Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
+                    // Smoothly rotate towards the target direction
+                    transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+                }
             }
-            // Move the player
-            MovePlayer(moveDirection);
-
-            // Set animation based on movement
-            SetMovementAnimation(moveDirection);
-        }
-        #endregion
-
-
-        #region Private Methods
-
-        private Vector3 CalculateMoveDirection(float horizontalValue, float verticalValue)
-        {
-            // Calculate move direction relative to the camera's forward direction
-            Vector3 forward = Vector3.Scale(_rigidbody.transform.forward, new Vector3(1, 0, 1)).normalized;
-            Vector3 right = Vector3.Scale(_rigidbody.transform.right, new Vector3(1, 0, 1)).normalized;
-
-            return (forward * verticalValue + right * horizontalValue).normalized;
         }
 
-        void MovePlayer(Vector3 direction)
+        private void HandleMovement()
         {
-            // Move the player using Rigidbody for physics-based movement
-            Vector3 newPosition = _rigidbody.position + direction * _playerSpeed * Time.deltaTime;
-            _rigidbody.MovePosition(newPosition);
+            // Get horizontal and vertical input values
+            float horizontalValue = Input.GetAxis("Horizontal");
+            float verticalValue = Input.GetAxis("Vertical");
+
+            // Calculate movement direction relative to the player's orientation
+            Vector3 moveDirection = new Vector3(horizontalValue, 0f, verticalValue).normalized;
+            moveDirection = transform.TransformDirection(moveDirection);
+
+            // Apply movement speed
+            _characterController.Move(moveDirection * _playerSpeed * Time.deltaTime);
+
+            // Apply gravity
+            if (!_characterController.isGrounded)
+            {
+                _moveDirection.y -= _gravity * Time.deltaTime;
+            }
         }
-        void SetMovementAnimation(Vector3 moveDirection)
+
+        private void HandleAnimation()
         {
-            // Set animation based on movement direction
-            if (moveDirection.magnitude > 0)
-            {
-                _playerAnimator.SetFloat("moveAmount", .5f); // Playing Walking Animation
-            }
-            else
-            {
-                _playerAnimator.SetFloat("moveAmount", 0); // Playing Idle Animation
-            }
+            // Update animations based on movement
+            _playerAnimator.SetFloat("moveAmount", _characterController.velocity.magnitude / _playerSpeed); // Adjust based on your animation setup
         }
 
         public void PlayAttack()
         {
+            // Trigger attack animation
             _playerAnimator.SetBool("isAttacking", true);
         }
-        #endregion
     }
 }
