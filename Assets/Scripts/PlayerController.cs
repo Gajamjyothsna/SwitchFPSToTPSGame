@@ -140,6 +140,10 @@ namespace TPSGame
                 if (UIController.Instance.key.Length == 5)
                 {
                     UIController.Instance.DisplayPopUpMessage("Go out of the room, the real game starts");
+                    TPSGameManager.Instance.SwitchView();
+                    transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
+
+                    //Instantiate the Enemies 
                 }
             }
         }
@@ -155,6 +159,7 @@ namespace TPSGame
                 // Reset player's y position to ground level when exiting climb trigger
                 transform.position = new Vector3(transform.position.x, _characterController.stepOffset, transform.position.z);
             }
+           
         }
 
         private void FixedUpdate()
