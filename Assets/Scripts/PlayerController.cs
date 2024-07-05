@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -13,11 +14,14 @@ namespace TPSGame
         [SerializeField] private CharacterController _characterController;
         [SerializeField] private Transform _cameraTransform; // Reference to the camera's transform
         [SerializeField] private DoorController _doorController;
+        [SerializeField] private GameObject _weapon;
+        [SerializeField] private int damgeValue;
+
 
         private Vector3 _moveDirection = Vector3.zero;
         private Vector3 _climbOffset = Vector3.zero;
         private bool _isClimbing = false;
-        
+        private bool hasDisplayedMessage = false; // Track if the message has been displayed
 
         private void Start()
         {
@@ -55,8 +59,18 @@ namespace TPSGame
                 // Ensure target direction is normalized
                 if (targetDirection.magnitude > 0)
                 {
-                    // Calculate target rotation
-                    Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+                    Quaternion targetRotation;
+
+                    if (verticalValue < -0.01f)
+                    {
+                        // If the backward button is pressed, rotate 180 degrees
+                        targetRotation = Quaternion.LookRotation(-transform.forward);
+                    }
+                    else
+                    {
+                        // Calculate target rotation for other directions
+                        targetRotation = Quaternion.LookRotation(targetDirection);
+                    }
 
                     // Smoothly rotate towards the target direction
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
@@ -112,7 +126,16 @@ namespace TPSGame
         public void PlayAttack()
         {
             // Trigger attack animation
+            _weapon.SetActive(true);
             _playerAnimator.SetBool("isAttacking", true);
+            StartCoroutine(ResetAttackAfterDelay(1f)); // Adjust the delay as needed
+        }
+
+        private IEnumerator ResetAttackAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            _playerAnimator.SetBool("isAttacking", false);
+            _weapon.SetActive(false);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -128,10 +151,21 @@ namespace TPSGame
             if (other.CompareTag("DoorPoint"))
             {
                 _doorController.OpenDoor();
-                UIController.Instance.DisplayPopUpMessage("Collect Blue Color Objects to Get the Keys");
+                if(hasDisplayedMessage == false)
+                {
+                    UIController.Instance.DisplayPopUpMessage("Collect Blue Color Objects to Get the Keys");
+                    hasDisplayedMessage = true;
+                }
             }
 
-            if(other.CompareTag("Key"))
+            if (other.CompareTag("SmallEnemySword") || other.CompareTag("LargeEnemySword"))
+            {
+                //Take the damage of the health of the Player
+                Debug.Log("Player Hit");
+                UIController.Instance.UpdatePlayerHealth(damgeValue, false);
+            }
+
+            if (other.CompareTag("Key"))
             {
                 string text = GetRandomAlphabet().ToString();
                 UIController.Instance.DisplayKey(text);
@@ -142,10 +176,16 @@ namespace TPSGame
                     UIController.Instance.DisplayPopUpMessage("Go out of the room, the real game starts");
                     TPSGameManager.Instance.SwitchView();
                     transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
-
                     //Instantiate the Enemies 
+                    StartCoroutine(InvokeEnemiesAfterDelay());
                 }
             }
+        }
+
+        private IEnumerator InvokeEnemiesAfterDelay()
+        {
+            yield return new WaitForSeconds(8f);
+            TPSGameManager.Instance.StartSpawnController();
         }
 
         private void OnTriggerExit(Collider other)

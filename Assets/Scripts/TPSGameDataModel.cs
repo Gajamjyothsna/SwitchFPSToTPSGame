@@ -10,12 +10,8 @@ namespace TPSGame
         [System.Serializable]
         public enum PoolObjectType
         {
-            FireBall,
-            Enemy,
-            Bullet,
-            Coin,
-            BulletPS,
-            FireBallPS
+            SmallEnemy,
+            LargeEnemy
         }
 
         [System.Serializable]

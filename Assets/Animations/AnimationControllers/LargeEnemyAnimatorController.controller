@@ -101,7 +101,7 @@ BlendTree:
     m_DirectBlendParameter: EnemyAnimationAmount
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -203655887218126122, guid: 03b6176e1c0700144b9776cac70445a4, type: 3}
+    m_Motion: {fileID: -203655887218126122, guid: 1988982f329ded640a3f7cb6bba52ddf, type: 3}
     m_Threshold: 0.75
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1

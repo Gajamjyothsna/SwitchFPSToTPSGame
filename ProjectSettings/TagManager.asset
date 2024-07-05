@@ -9,6 +9,10 @@ TagManager:
   - ClimbTrigger
   - ExitClimbTrigger
   - Key
+  - LargeEnemy
+  - SmallEnemy
+  - SmallEnemySword
+  - LargeEnemySword
   layers:
   - Default
   - TransparentFX

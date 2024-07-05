@@ -1,18 +1,12 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using static TPSGame.TPSGameDataModel;
 
 namespace TPSGame
 {
     public class TPSGameManager : MonoBehaviour
     {
-        #region GameType Model
-        public enum GameState
-        {
-            Playing,
-            GameOver
-        }
-        #endregion
-
         #region Singleton
         private static TPSGameManager _instance;
 
@@ -38,9 +32,12 @@ namespace TPSGame
         [SerializeField] private GameObject _tpsCamera;
         [SerializeField] private GameObject _fpsCamera;
         [SerializeField] private GameObject _tpsVirtualCamera;
+        [Header("SpawnController")]
+        [SerializeField] private SpawnController _spawnController;
 
         private bool isTPS = false;
         public GameState CurrentGameState { get; private set; } = GameState.Playing;
+        public Action<GameState> OnGameStateChanged;
         #endregion
 
         #region MonoBehaviour Methods
@@ -85,6 +82,24 @@ namespace TPSGame
             _tpsCamera.SetActive(isTPS);
             _tpsVirtualCamera.SetActive(isTPS);
             _fpsCamera.SetActive(!isTPS);
+        }
+
+        public void StartSpawnController()
+        {
+            _spawnController.StartNextWave();
+        }
+
+        public void SetGameOver()
+        {
+            CurrentGameState = GameState.GameOver;
+            OnGameStateChanged?.Invoke(GameState.GameOver);
+            UIController.Instance.GameOver();
+        }
+
+        public void SetPlayAgain()
+        {
+            CurrentGameState = GameState.Playing;
+            UIController.Instance.PlayAgain();
         }
         #endregion
 
