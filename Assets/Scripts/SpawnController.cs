@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.EditorTools;
 using UnityEngine;
+using static TPSGame.TPSGameDataModel;
 
 namespace TPSGame
 {
@@ -18,8 +19,20 @@ namespace TPSGame
         #endregion
 
         #region Public Methods
+
+        private void Start()
+        {
+            if (TPSGameManager.Instance.CurrentGameState == GameState.GameOver) return;
+            TPSGameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+        }
+
+        private void OnDisable()
+        {
+            TPSGameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+        }
         public void StartNextWave()
         {
+            if (TPSGameManager.Instance.CurrentGameState == GameState.GameOver) return;
             if (currentWave >= waveCount)
             {
                 Debug.Log("All waves completed!");
@@ -81,6 +94,30 @@ namespace TPSGame
             if (enemiesRemaining <= 0)
             {
                 Invoke(nameof(StartNextWave), 5f); // Wait 5 seconds before starting the next wave
+            }
+        }
+
+        private void HandleGameStateChanged(GameState newGameState)
+        {
+            if (newGameState == GameState.GameOver)
+            {
+                DisableActiveEnemies();
+                Debug.Log("Disable The enemies");
+            }
+        }
+
+        private void DisableActiveEnemies()
+        {
+            var activeLargeEnemies = GameObject.FindGameObjectsWithTag("LargeEnemy");
+            foreach (var enemy in activeLargeEnemies)
+            {
+                enemy.SetActive(false);
+            }
+
+            var activeSmallEnemies = GameObject.FindGameObjectsWithTag("SmallEnemy");
+            foreach (var enemy in activeSmallEnemies)
+            {
+                enemy.SetActive(false);
             }
         }
         #endregion

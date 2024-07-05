@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using static TPSGame.TPSGameDataModel;
 
 namespace TPSGame
 {
@@ -16,13 +17,15 @@ namespace TPSGame
         [SerializeField] private DoorController _doorController;
         [SerializeField] private GameObject _weapon;
         [SerializeField] private int damgeValue;
+        [SerializeField] private float attackDelay = .5f; // Adjust the delay as needed
 
 
         private Vector3 _moveDirection = Vector3.zero;
         private Vector3 _climbOffset = Vector3.zero;
         private bool _isClimbing = false;
         private bool hasDisplayedMessage = false; // Track if the message has been displayed
-        [SerializeField] private float attackDelay = .5f; // Adjust the delay as needed
+        private AudioSource _audioSource;
+        private bool isWalkingSoundPlaying;
 
         private void Start()
         {
@@ -30,20 +33,23 @@ namespace TPSGame
             {
                 _characterController = GetComponent<CharacterController>();
             }
+            _audioSource = GetComponent<AudioSource>();
 
             // Print initial position for debugging
             Debug.Log($"Initial player position: {transform.position}");
+            TPSGameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
 
-
-//#Todo : testing puroses
-            TPSGameManager.Instance.SwitchView();
-            transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
-            //Instantiate the Enemies 
-            StartCoroutine(InvokeEnemiesAfterDelay());
+            if(TPSGameManager.Instance.CurrentGameState == GameState.Playing) this.gameObject.SetActive(true);
+            
         }
 
+        private void OnDisable()
+        {
+            TPSGameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+        }
         private void Update()
         {
+            if (TPSGameManager.Instance.CurrentGameState == GameState.GameOver) return;
             HandleRotation();
             HandleMovement();
             HandleAnimation();
@@ -124,10 +130,20 @@ namespace TPSGame
             if (Mathf.Abs(horizontalValue) > 0.01f || Mathf.Abs(verticalValue) > 0.01f)
             {
                 _playerAnimator.SetFloat("moveAmount", 1f);
+
+                // Play the walking sound if not already playing
+                if (!isWalkingSoundPlaying)
+                {
+                    SoundManager.Instance.PlaySound(_audioSource, SoundType.PlayerWalk);
+                    isWalkingSoundPlaying = true;
+                }
             }
             else
             {
                 _playerAnimator.SetFloat("moveAmount", 0f);
+                SoundManager.Instance.PlaySound(_audioSource, SoundType.None);
+                if (_audioSource.clip == null) _audioSource.Stop();
+                isWalkingSoundPlaying = false;
             }
         }
 
@@ -167,9 +183,9 @@ namespace TPSGame
 
             if (other.CompareTag("SmallEnemySword") || other.CompareTag("LargeEnemy"))
             {
-                //Take the damage of the health of the Player
-                if (other.CompareTag("SmallEnemySword")) Debug.Log("Small Player Hit");
-                else if(other.CompareTag("LargeEnemy")) Debug.Log("Large Player Hit");
+                //Take the damage of the health of the Player 
+                if (other.CompareTag("SmallEnemySword")) Debug.Log("Small enemy Player Hit");
+                else if(other.CompareTag("LargeEnemy")) Debug.Log("Large by Enemy Player Hit");
 
                 UIController.Instance.UpdatePlayerHealth(damgeValue, false);
             }
@@ -229,6 +245,26 @@ namespace TPSGame
             char randomAlphabet = (char)('A' + randomNumber);
 
             return randomAlphabet;
+        }
+
+        private void HandleGameStateChanged(GameState newGameState)
+        {
+            if (newGameState == GameState.GameOver)
+            {
+                _playerAnimator.SetTrigger("isDie");
+                 SoundManager.Instance.PlaySound(_audioSource, SoundType.PlayerDie);
+
+                StartCoroutine(ShowPlayerDieAnimation());
+            }
+        }
+        private IEnumerator ShowPlayerDieAnimation()
+        {
+            yield return new WaitForSeconds(3f);
+            if (this.gameObject.activeInHierarchy)
+            {
+                this.gameObject.SetActive(false);
+            }
+            UIController.Instance.GameOver();
         }
 
     }

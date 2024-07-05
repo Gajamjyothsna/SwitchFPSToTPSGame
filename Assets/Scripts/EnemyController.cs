@@ -23,6 +23,7 @@ namespace TPSGame
         [SerializeField] private float _dieValue;
 
         private Transform _target;
+        private AudioSource _audioSource;
        
         private float fixedYPosition; // Fixed Y position for the enemy
         private float separationDistance = 1f; // Minimum distance between enemies
@@ -45,9 +46,11 @@ namespace TPSGame
         #region MonoBehaviour Methods
         void Start()
         {
+            _audioSource = GetComponent<AudioSource>();
             _target = GameObject.Find("Player").transform;
             _enemyAnimator.SetFloat(_enemyBlendValue, _idleValue);
             fixedYPosition = transform.position.y; // Store the initial Y position
+            SoundManager.Instance.PlaySound(_audioSource, TPSGameDataModel.SoundType.EnemyRoar);
         }
 
         // Update is called once per frame
@@ -140,6 +143,8 @@ namespace TPSGame
         public void Die()
         {
             IsDead = true;
+            Debug.Log("enemy type is killed" + _enemyType);
+            SoundManager.Instance.PlaySound(_audioSource, TPSGameDataModel.SoundType.EnemyRoar);
             StartCoroutine(DelayAnimation());
         }
         IEnumerator DelayAnimation()
@@ -148,6 +153,7 @@ namespace TPSGame
             _enemyAnimator.SetFloat(_enemyBlendValue, _dieValue); // Set animation to idle or death
             yield return new WaitForSeconds(1f);
             GameObject.Find("SpawnController").GetComponent<SpawnController>().EnemyDefeated(gameObject, _enemyType); // Notify the SpawnController
+            gameObject.SetActive(false);
         }
     }
 

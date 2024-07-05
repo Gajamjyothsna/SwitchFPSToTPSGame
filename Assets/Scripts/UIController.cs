@@ -124,7 +124,7 @@ namespace TPSGame
         public void GameOver()
         {
             _gameOverUI.SetActive(true);
-            _gameOverUI.SetActive(false );
+            _gamePanelUI.SetActive(false );
         }
 
         public void PlayAgain()

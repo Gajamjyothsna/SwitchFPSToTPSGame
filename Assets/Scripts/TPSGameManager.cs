@@ -93,7 +93,6 @@ namespace TPSGame
         {
             CurrentGameState = GameState.GameOver;
             OnGameStateChanged?.Invoke(GameState.GameOver);
-            UIController.Instance.GameOver();
         }
 
         public void SetPlayAgain()
