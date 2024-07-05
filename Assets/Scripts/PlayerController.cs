@@ -252,14 +252,16 @@ namespace TPSGame
             if (newGameState == GameState.GameOver)
             {
                 _playerAnimator.SetTrigger("isDie");
-                 SoundManager.Instance.PlaySound(_audioSource, SoundType.PlayerDie);
 
                 StartCoroutine(ShowPlayerDieAnimation());
             }
         }
         private IEnumerator ShowPlayerDieAnimation()
         {
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(1f);
+            SoundManager.Instance.PlaySound(_audioSource, SoundType.PlayerDie);
+
+            yield return new WaitForSeconds(2f);
             if (this.gameObject.activeInHierarchy)
             {
                 this.gameObject.SetActive(false);
