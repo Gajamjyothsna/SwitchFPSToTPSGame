@@ -56,11 +56,23 @@ namespace TPSGame
                 {
                     enemy = ObjectPooling.Instance.SpawnFromPool(TPSGameDataModel.PoolObjectType.LargeEnemy, spawnPoint.position, Quaternion.identity);
                 }
+                // Optionally perform a ground check and adjust position
+                AdjustToGround(enemy);
             }
             UIController.Instance.DisplayPopUpMessage("Enemies are ready to attack you!!");
         }
 
-        public void EnemyDefeated(GameObject enemy, bool isBigEnemy)
+        void AdjustToGround(GameObject enemy)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(enemy.transform.position, Vector3.down, out hit))
+            {
+                Vector3 newPosition = hit.point;
+                newPosition.y += enemy.GetComponent<Collider>().bounds.extents.y;
+                enemy.transform.position = newPosition;
+            }
+        }
+        public void EnemyDefeated(GameObject enemy, TPSGameDataModel.PoolObjectType enemyType)
         {
             enemiesRemaining--;
            // poolManager.ReturnToPool(enemy, isBigEnemy);

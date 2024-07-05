@@ -65,6 +65,8 @@ namespace TPSGame
         #region private Methods
         private void DisplayPlayerHealth()
         {
+            Debug.Log("CurrentHealth :" + _currentPlayerHealth);
+            Debug.Log("Max Health" + _maxPlayerHealth);
             _playerHealthSlider.value = (float)_currentPlayerHealth / _maxPlayerHealth;
         }
         #endregion
@@ -106,6 +108,7 @@ namespace TPSGame
             }
             else
             {
+                Debug.Log("True");
                 _currentPlayerHealth += damage;
                 if (_currentPlayerHealth > _maxPlayerHealth)
                 {

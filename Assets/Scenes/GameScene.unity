@@ -3686,12 +3686,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pools:
-  - capacity: 20
+  - capacity: 5
+    poolGameObject: {fileID: 1624394358939582138, guid: b65db8e092f6924438df981118352fcb, type: 3}
+    PoolObjectType: 1
+  - capacity: 5
     poolGameObject: {fileID: 3433760773650061676, guid: 48a6da5e070d1be439744de2cc5d37ba, type: 3}
     PoolObjectType: 0
-  - capacity: 20
-    poolGameObject: {fileID: 3305857591221905697, guid: 235a6311c3d73694994e342b2647ff7d, type: 3}
-    PoolObjectType: 1
 --- !u!1 &1332601899
 GameObject:
   m_ObjectHideFlags: 0
@@ -5151,6 +5151,8 @@ MonoBehaviour:
   _cameraTransform: {fileID: 1179706792}
   _doorController: {fileID: 1193543893}
   _weapon: {fileID: 2069805745}
+  damgeValue: 10
+  attackDelay: 0.1
 --- !u!143 &1793101685
 CharacterController:
   m_ObjectHideFlags: 0
@@ -6146,6 +6148,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 6b559dcaf7153b54da391574beac732f, type: 3}
       propertyPath: m_Name
       value: model
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6b559dcaf7153b54da391574beac732f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

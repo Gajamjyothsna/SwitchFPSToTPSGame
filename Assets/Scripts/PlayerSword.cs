@@ -18,16 +18,14 @@ namespace TPSGame
             {
                 //Take Large enemy value;
                 Debug.Log("Large Enemy Hit");
-                other.gameObject.GetComponent<Animator>().SetFloat("EnemyAnimationAmount", 1);
-                other.gameObject.SetActive(false);
+                other.gameObject.GetComponent<EnemyController>().Die();
                 UIController.Instance.UpdatePlayerHealth(_gainLargeEnemyDamageValue, true);
             }
             if (other.CompareTag(TPSGameDataModel.PoolObjectType.SmallEnemy.ToString()))
             {
                 //Take small enemy value;
                 Debug.Log("Small Enemy Hit");
-                other.gameObject.GetComponent<Animator>().SetFloat("SmallEnemyAmount", 1);
-                other.gameObject.SetActive(false);
+                other.gameObject.GetComponent<EnemyController>().Die();
                 UIController.Instance.UpdatePlayerHealth(_gainSmallEnemyDamageValue, true);
             }
         }

@@ -22,6 +22,7 @@ namespace TPSGame
         private Vector3 _climbOffset = Vector3.zero;
         private bool _isClimbing = false;
         private bool hasDisplayedMessage = false; // Track if the message has been displayed
+        [SerializeField] private float attackDelay = .5f; // Adjust the delay as needed
 
         private void Start()
         {
@@ -32,6 +33,13 @@ namespace TPSGame
 
             // Print initial position for debugging
             Debug.Log($"Initial player position: {transform.position}");
+
+
+//#Todo : testing puroses
+            TPSGameManager.Instance.SwitchView();
+            transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
+            //Instantiate the Enemies 
+            StartCoroutine(InvokeEnemiesAfterDelay());
         }
 
         private void Update()
@@ -125,19 +133,18 @@ namespace TPSGame
 
         public void PlayAttack()
         {
-            // Trigger attack animation
+            // Trigger attack animation and activate weapon
             _weapon.SetActive(true);
             _playerAnimator.SetBool("isAttacking", true);
-            StartCoroutine(ResetAttackAfterDelay(1f)); // Adjust the delay as needed
         }
 
-        private IEnumerator ResetAttackAfterDelay(float delay)
+        // This method will be called by the animation event
+        public void OnAttackAnimationEnd()
         {
-            yield return new WaitForSeconds(delay);
+            Debug.Log("Animation Event");
             _playerAnimator.SetBool("isAttacking", false);
             _weapon.SetActive(false);
         }
-
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("ClimbTrigger"))
@@ -158,10 +165,12 @@ namespace TPSGame
                 }
             }
 
-            if (other.CompareTag("SmallEnemySword") || other.CompareTag("LargeEnemySword"))
+            if (other.CompareTag("SmallEnemySword") || other.CompareTag("LargeEnemy"))
             {
                 //Take the damage of the health of the Player
-                Debug.Log("Player Hit");
+                if (other.CompareTag("SmallEnemySword")) Debug.Log("Small Player Hit");
+                else if(other.CompareTag("LargeEnemy")) Debug.Log("Large Player Hit");
+
                 UIController.Instance.UpdatePlayerHealth(damgeValue, false);
             }
 
